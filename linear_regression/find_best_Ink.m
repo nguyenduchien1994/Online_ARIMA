@@ -1,11 +1,12 @@
 %Find the best In(k) given the dataset
-function [fits_train, fits_test, mses_train, mses_test, best_k_train, best_k_test] = find_best_Ink(xtrain, ytrain, xtest, ytest, degree, min_k, max_k)
+function [fits_train, fits_test, mses_train, mses_test, best_k] = find_best_Ink(xtrain, ytrain, xtest, ytest, degree, min_k, max_k)
 
 ek = min_k:1:max_k;
 fits_train = zeros(size(ytrain, 1), size(ek, 2));
 fits_test = zeros(size(ytest, 1), size(ek, 2));
 mses_train = zeros(size(ek, 2), 1);
 mses_test = zeros(size(ek, 2), 1);
+best_k = zeros(2, 1);
 
 for j = 1:1:size(ek, 2);
     %Set k
@@ -35,7 +36,7 @@ for j = 1:1:size(ek, 2);
 end
 
 %Find the k that give minimum MSE for train data
-[~, best_k_train] = min(mses_train(:));
+[~, best_k(1)] = min(mses_train(:));
 
 %Find the k that give minimum MSE for test data
-[~, best_k_test] = min(mses_test(:));
+[~, best_k(2)] = min(mses_test(:));
