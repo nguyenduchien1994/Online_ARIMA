@@ -99,7 +99,7 @@ for t in range(len(X_test)):
 plt.figure()
 plt.plot(X_test)
 plt.plot(X_pred)
-plt.title('Last 30% of artificial data')
+plt.title('Last 30% of Bitcoin data')
 plt.xlabel('Index')
 plt.ylabel('Observed value')
 plt.legend(['True price', 'Predicted price'], loc=4)
