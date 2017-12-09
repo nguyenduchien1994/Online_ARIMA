@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import statsmodels.api as sm
 from statsmodels.tsa.arima_model import ARIMA
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 # Load data
 artificial_data = scipy.io.loadmat('artificial_data.mat')
@@ -61,20 +62,6 @@ for p in range(p_max + 1):
 # Choose values of p and q that gives the smallest AIC
 p, q = np.unravel_index(aic.argmin(), aic.shape)
 
-# Use the best values of p and q to model data (in-sample)
-model = ARIMA(X, [p, d, q])
-model_fit = model.fit(disp=-1)
-X_est = model_fit.predict(start=1, end=len(X)-1, typ='levels')
-
-# Plot predicted data along with original data
-plt.figure()
-plt.plot(X[1:])
-plt.plot(X_est)
-plt.title('Artificial data')
-plt.xlabel('Index')
-plt.ylabel('Observed value')
-plt.legend(['True value', 'Predicted value'], loc=4)
-
 # The following section is borrowed from IBM Data Science Experience
 # https://datascience.ibm.com/exchange/public/entry/view/815137c868b916821dec777bdc23013c
 
@@ -83,6 +70,11 @@ train_size = int(len(X) * 0.7)
 X_train, X_test = X[:train_size], X[train_size:]
 history = [x for x in X_train]
 X_pred = list()
+
+# Use the best values of p and q to model data (in-sample)
+model = ARIMA(X_train, [p, d, q])
+model_fit = model.fit(disp=-1)
+X_est = model_fit.predict(start=1, end=train_size, typ='levels')
 
 # Perform rolling forecast
 for t in range(len(X_test)):
@@ -93,9 +85,16 @@ for t in range(len(X_test)):
     
 # Plot the true remaining 30% data with the predicted values
 plt.figure()
-plt.plot(X_test)
-plt.plot(X_pred)
-plt.title('Last 30% of artificial data')
+plt.plot(range(len(X)), X)
+plt.plot(range(train_size), X_est)
+plt.plot(range(train_size, len(X)), X_pred)
+plt.title('Artificial data')
 plt.xlabel('Index')
 plt.ylabel('Observed value')
-plt.legend(['True value', 'Predicted value'], loc=4)
+plt.legend(['True value', 'Fitted value', 'Forecasted value'], loc=4, fontsize= 'small')
+
+# Calculate MSE and MAE
+train_mse = mean_squared_error(X_train, X_est)
+train_mae = mean_absolute_error(X_train, X_est)
+test_mse = mean_squared_error(X_test, X_pred)
+test_mae = mean_absolute_error(X_test, X_pred)
