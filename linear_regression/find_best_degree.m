@@ -1,11 +1,11 @@
 %Find the best degree given the dataset
-function [fits_train, fits_test, mses_train, mses_test, best_deg] = find_best_degree(xtrain, ytrain, xtest, ytest, max_deg)
+function [fits_train, fits_test, mses, maes, best_deg] = find_best_degree(xtrain, ytrain, xtest, ytest, max_deg)
 
 %Recreate the train data
 temp_xtrain = xtrain;
 ps = zeros(max_deg, max_deg + 1);
-mses_train = zeros(max_deg, 1);
-mses_test = zeros(max_deg, 1);
+mses = zeros(max_deg, 2);
+maes = zeros(max_deg, 2);
 fits_train = zeros(size(ytrain, 1), max_deg);
 fits_test = zeros(size(ytest, 1), max_deg);
 best_deg = zeros(2, 1);
@@ -30,12 +30,16 @@ for d = 1:1:max_deg
     end
     
     %Calculate the MSE
-    mses_train(d) = immse(fits_train(:, d), ytrain);
-    mses_test(d) = immse(fits_test(:, d), ytest); 
+    mses(d, 1) = immse(fits_train(:, d), ytrain);
+    mses(d, 2) = immse(fits_test(:, d), ytest); 
+    
+    %Calculate the MAE
+    maes(d, 1) = mae(ytrain - fits_train(:, d));
+    maes(d, 2) = mae(ytest - fits_test(:, d));
 end
 
 %Find the degree that give minimum MSE for train data
-[~, best_deg(1)] = min(mses_train(:));
+[~, best_deg(1)] = min(mses(:, 1));
 
 %Find the degree that give minimum MSE for test data
-[~, best_deg(2)] = min(mses_test(:));
+[~, best_deg(2)] = min(mses(:, 2));
