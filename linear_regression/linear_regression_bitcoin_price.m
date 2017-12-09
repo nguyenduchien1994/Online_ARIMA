@@ -2,9 +2,11 @@
 %Load data from real Bitcoin price data
 data_y = flipud(csvread('bitcoin_daily_usd.csv', 2, 4));
 data_x = (1:1:size(data_y, 1))';
+data_y = data_y(500:999);
+data_x = data_x(500:999);
 
 %We choose about two thirds as our train data and the rest to be test data
-train_size = 1200;
+train_size = round(size(data_y, 1) * 0.7);
 xtrain = data_x(1:train_size, 1);
 ytrain = data_y(1:train_size, 1);
 xtest = data_x(train_size + 1:end, 1);

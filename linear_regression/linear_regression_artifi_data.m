@@ -15,25 +15,25 @@ ytest = data_y(train_size + 1:end, 1);
 mdl = fitlm(xtrain, ytrain, 'poly9', 'RobustOpts', 'on')
 %Get coefficient from the fitlm model
 %estimate_1 = 1 + (-0.0011825) * xtrain + (2.4641e-09) * xtrain .^2;
-estimate_1_train = 1 + (9.5588e-15) * xtrain .^6 + (-1.8643e-17) * xtrain .^7 + (1.2087e-20) * xtrain .^8 + (-2.5514e-24) * xtrain .^9;
-estimate_1_test = 1 + (9.5588e-15) * xtest .^6 + (-1.8643e-17) * xtest .^7 + (1.2087e-20) * xtest .^8 + (-2.5514e-24) * xtest .^9;
-MSE_fitlm_train = (sum((estimate_1_train - ytrain) .^ 2))^(0.5)/size(ytrain, 1)
-MSE_fitlm_test = (sum((estimate_1_test - ytest) .^ 2))^(0.5)/size(ytest, 1)
+estimate_1_train = 1 + (-1.461e-08) * xtrain .^5 + (3.3831e-10) * xtrain .^6 + (-2.9154e-12) * xtrain .^7 + (1.1117e-14) * xtrain .^8 + (-1.5844e-17) * xtrain .^9;
+estimate_1_test = 1 + (-1.461e-08) * xtest .^5 + (3.3831e-10) * xtest .^6 + (-2.9154e-12) * xtest .^7 + (1.1117e-14) * xtest .^8 + (-1.5844e-17) * xtest .^9;
+MSE_fitlm_train = immse(estimate_1_train, ytrain)
+MSE_fitlm_test = immse(estimate_1_test, ytest)
 
 %Use robustfit() to build the linear model
 %Get coefficient from the robust fit 
 rob_coeff = robustfit(xtrain, ytrain);
 estimate_2_train = rob_coeff(1) + rob_coeff(2) * xtrain;
 estimate_2_test = rob_coeff(1) + rob_coeff(2) * xtest;
-MSE_robustfit_train = (sum((estimate_2_train - ytrain) .^ 2))^(0.5)/size(ytrain, 1)
-MSE_robustfit_test = (sum((estimate_2_test - ytest) .^ 2))^(0.5)/size(ytest, 1)
+MSE_robustfit_train = immse(estimate_2_train, ytrain)
+MSE_robustfit_test = immse(estimate_2_test, ytest)
 
 %Use regress() to build the linear model
 b = regress(ytrain, xtrain);
 estimate_3_train = b * xtrain;
 estimate_3_test = b * xtest;
-MSE_regress_train = (sum((estimate_3_train - ytrain) .^ 2))^(0.5)/size(ytrain, 1)
-MSE_regress_test = (sum((estimate_3_test - ytest) .^ 2))^(0.5)/size(ytest, 1)
+MSE_regress_train = immse(estimate_3_train, ytrain)
+MSE_regress_test = immse(estimate_3_test, ytest)
 
 %Plot the train dand test ata and estimates
 figure(1);
