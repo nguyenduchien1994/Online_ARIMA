@@ -36,7 +36,7 @@ hold off
 title('Results for polynomial fits with various degrees in train data');
 legend('origin data', 'degree = 2', ['degree = ', num2str(max_deg)], ['degree = ', num2str(round(max_deg/2))], ['degree = ', num2str(round(max_deg/3))], 'best train degree',  'best test degree');
 xlabel('date');
-ylabel('Bitcoin price(in dollars)');
+ylabel('Bitcoin price(in USD)');
 
 %Plot the MSE for train data and test data with degreee from 1 to
 %Max_degree
@@ -47,8 +47,8 @@ legend('MSE for training data', 'MSE for testing data');
 xlabel('degree');
 ylabel('MSE');
 
-%Second step, since we found the best degree, then we need to find the
-%In(namida) for the best deg train and best deg test
+%Second step, since we found the best degree for train data and test data, then we need to find the
+%In(namida) with L2 regularization for the best deg train and best deg test
 best_deg = [best_deg_train; best_deg_test];
 min_k = -25;
 max_k = 25;
@@ -78,7 +78,7 @@ for i = 1:1:2
     title(['Original degree poly degree = ', num2str(best_deg(i)), 'fit vs L2-regularized degree = ', num2str(best_k_value), ' fit with smallest MSE']);
     legend('test data', 'original poly fit', 'L2-regularized fit with smallest MSE');
     xlabel('date');
-    ylabel('Bitcoin price (dollars)');
+    ylabel('Bitcoin price(in USD)');
 
 
     %Plot the result for test data L2-regularized fit with best degree and best In(k) 
@@ -91,5 +91,5 @@ for i = 1:1:2
     title(['L2-regularized degree = ', num2str(best_deg(i)), ' In(k) = ', num2str(best_k(i)), ' fit with smallest MSE']);
     legend('test data', 'L2-regularized fit with smallest MSE');
     xlabel('date');
-    ylabel('Bitcoin price (dollars)');
+    ylabel('Bitcoin price(in USD)');
 end
