@@ -162,4 +162,4 @@ ylabel('Bitcoin price (in USD)');
 best_train_MSE = mses_train(best_day_length_test)
 best_test_MSE = mses_test(best_day_length_test)
 best_train_MAE = maes_train(best_day_length_test)
-best_train_MAE = maes_test(best_day_length_test)
+best_test_MAE = maes_test(best_day_length_test)
