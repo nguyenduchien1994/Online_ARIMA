@@ -6,7 +6,7 @@ data_y = flipud(csvread('bitcoin_daily_usd.csv', 2, 4));
 data_y = data_y(500:999);
 data_x = (1:1:size(data_y, 1))';
 
-%We choose about two thirds as our train data and the rest to be test data
+%We choose about first 70% as our train data and the rest to be test data
 train_size = round(size(data_y, 1) * 0.7);
 ytrain = data_y(1:train_size, 1);
 xtrain_index = data_x(1:train_size, 1);
@@ -15,7 +15,7 @@ xtest_index = data_x(train_size:end, 1);
 
 %Determine how many previous days we are going to use to predict the next
 %dlen value
-max_day_len = 100;
+max_day_len = 100; %In here, we decide to use maximum previous 100 days data to calculate the next day data
 mses_train = zeros(max_day_len, 1);
 maes_train = zeros(max_day_len, 1);
 mses_test = zeros(max_day_len, 1);
@@ -27,7 +27,7 @@ for dlen = 1:1:max_day_len
     xtest = zeros(size(ytest, 1), dlen);
 
     %We choose to not build xtrain data from index 1 to dlen data because before index 1, there
-    %is previous y data exist
+    %is previous y data available to use
     for i = (dlen + 1):1:size(ytrain, 1)
         temp_xtrain_row = [];
         for j = (i - 1):-1:(i - dlen)
@@ -37,12 +37,14 @@ for dlen = 1:1:max_day_len
         xtrain(i - dlen, :) = temp_xtrain_row;
     end
     
-    %Build the xtest data
+    %Build the xtest data in similar way
     temp_ytest = ytest;
     for i = 1:1:dlen
        temp_ytest = [ytrain(end - (i - 1)); temp_ytest]; 
     end
     
+    %This time, we wound not ignore the first dlen data because we could
+    %use ytrain data now
     for i = 1:1:dlen
         temp_xtest_row = [];
         for j = i:1:(dlen + (i - 1))
@@ -85,6 +87,7 @@ for dlen = 1:1:max_day_len
     maes_test(dlen) = mae(ytest - fit_test);
 end
 
+%Plot the MSEs and MAEs versus the different previous day length we tested
 figure(1)
 plot(1:1:max_day_len, mses_train, 1:1:max_day_len, mses_test, 1:1:max_day_len, maes_train, 1:1:max_day_len, maes_test);
 title('Different previous day length vs MSEs and MAEs');
@@ -92,9 +95,12 @@ leg1 = legend('Train MSE', 'Test MSE', 'Train MAE', 'Test MAE');
 xlabel('previous day length');
 ylabel('MSE and MAE');
 
+%Find the best previous day length that gives minimum test MSE
 [~, best_day_length_test] = min(mses_test)
-
 dlen = best_day_length_test;
+
+%Repeat the above steps to the best day length we found
+%-----%----%-----%-----%-----%------%-----%-------%-----%-------%-----%--%-----%
 
 %Intialize the xtrain and xtest value
 xtrain = zeros((size(ytrain, 1) - dlen), dlen);
@@ -152,13 +158,15 @@ for i = 1:1:size(ytest, 1)
     fit_test(i) = temp' * ps_train;
 end
 
+%Plot the best prediction we found
 figure(2)
 plot(data_x, data_y, xtrain_index(dlen + 1:end), fit_train, xtest_index, fit_test);
 title(['Regression Bitcoin price result (give minimum test MSE) for previous day length = ',  num2str(dlen)]);
-leg1 = legend('True value', 'Fitted value', 'Forecast value');
+leg1 = legend('True value', 'Fitted value', 'Forecasted value');
 xlabel('Index (Date)');
 ylabel('Bitcoin price (in USD)');
 
+%Calculate the best train MSE, test MSE, train MAE, and test MAE
 best_train_MSE = mses_train(best_day_length_test)
 best_test_MSE = mses_test(best_day_length_test)
 best_train_MAE = maes_train(best_day_length_test)
